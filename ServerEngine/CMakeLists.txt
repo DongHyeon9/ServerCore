@@ -6,10 +6,22 @@ add_library(ServerEngine STATIC ${SOURCES})
 
 target_include_directories(ServerEngine PUBLIC include)
 
-target_compile_options(ServerEngine PRIVATE
-    $<$<CONFIG:Debug>:-g -O0>
-    $<$<CONFIG:Release>:-O2 -DNDEBUG>
+target_link_libraries(ServerEngine PUBLIC
+    BoostAsio
+    protobuf::libprotobuf
 )
+
+if(MSVC)
+    target_compile_options(ServerEngine PRIVATE
+        $<$<CONFIG:Debug>:/Zi /Od /RTC1>
+        $<$<CONFIG:Release>:/O2>
+    )
+else()
+    target_compile_options(ServerEngine PRIVATE
+        $<$<CONFIG:Debug>:-g -O0>
+        $<$<CONFIG:Release>:-O2 -DNDEBUG>
+    )
+endif()
 
 set_target_properties(ServerEngine PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin/ServerEngine/debug"
