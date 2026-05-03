@@ -21,7 +21,13 @@ else()
     )
 endif()
 
+if(WIN32)
+    set(_BIN_PREFIX "${CMAKE_SOURCE_DIR}/bin/windows")
+else()
+    set(_BIN_PREFIX "${CMAKE_SOURCE_DIR}/bin/linux")
+endif()
+
 set_target_properties(ServerMonitor PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin/ServerMonitor/debug"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/ServerMonitor/release"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${_BIN_PREFIX}/debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_BIN_PREFIX}/release"
 )

@@ -2,7 +2,9 @@ project(TestServer)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_executable(TestServer ${SOURCES})
+add_executable(TestServer ${SOURCES} "include/TestServerDialog.h" "src/TestServerDialog.cpp")
+
+target_include_directories(TestServer PRIVATE include)
 
 target_link_libraries(TestServer PRIVATE
     ServerEngine
@@ -21,7 +23,13 @@ else()
     )
 endif()
 
+if(WIN32)
+    set(_BIN_PREFIX "${CMAKE_SOURCE_DIR}/bin/windows")
+else()
+    set(_BIN_PREFIX "${CMAKE_SOURCE_DIR}/bin/linux")
+endif()
+
 set_target_properties(TestServer PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/bin/TestServer/debug"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/TestServer/release"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${_BIN_PREFIX}/debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_BIN_PREFIX}/release"
 )
