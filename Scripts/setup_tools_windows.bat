@@ -1,10 +1,19 @@
 @echo off
 setlocal EnableDelayedExpansion
-echo [SETUP] Copying Windows build tools from VS2022 to Scripts\Tools\Windows\
-echo         Run this once per machine before building.
-echo.
+echo [SETUP] Windows Build Tools Setup
 
 for %%I in ("%~dp0..") do set "ROOT=%%~fI"
+set "DEST_BIN=%ROOT%\Scripts\Tools\Windows\bin"
+
+if exist "%DEST_BIN%\clang.exe" (
+    echo [INFO] Build tools already present in Scripts\Tools\Windows\
+    echo        clang.exe, cmake.exe, ninja.exe etc. are pre-committed in the repository.
+    echo        No setup needed -- you can build directly.
+    pause & exit /b 0
+)
+
+echo [SETUP] Tools not found. Copying from VS2022...
+echo.
 
 REM Find VS2022 (Community -> Professional -> Enterprise -> BuildTools)
 set "VS_BASE="
@@ -36,7 +45,6 @@ if not exist "%SRC_CMAKE_DIR%\bin\cmake.exe" ( echo [ERROR] cmake.exe not found:
 if not exist "%SRC_NINJA%\ninja.exe"          ( echo [ERROR] ninja.exe not found: %SRC_NINJA%       ^& pause ^& exit /b 1 )
 if not exist "%SRC_LLVM%\clang.exe"           ( echo [ERROR] clang.exe not found: %SRC_LLVM%        ^& pause ^& exit /b 1 )
 
-set "DEST_BIN=%ROOT%\Scripts\Tools\Windows\bin"
 mkdir "%DEST_BIN%" 2>nul
 
 echo [COPY] ninja.exe

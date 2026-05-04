@@ -6,6 +6,13 @@
 # Shell scripts must always have LF line endings (CRLF breaks bash in WSL)
 *.sh text eol=lf
 
+# Pre-committed Windows tool binaries — never apply text/EOL processing
+*.exe binary
+*.dll binary
+*.lib binary
+*.a   binary
+*.pdb binary
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #

@@ -369,9 +369,6 @@ FodyWeavers.xsd
 # CMake 빌드 디렉터리
 /build/
 
-# 프로젝트 로컬 빌드 도구 (setup_tools_windows.bat 으로 생성)
-/Scripts/Tools/Windows/
-
 # 런타임 생성 파일 (재실행 시 자동 생성됨)
 *.ini
 logs.txt

@@ -9,13 +9,15 @@ for %%I in ("%~dp0..") do set "ROOT=%%~fI"
 set "TOOLS=%ROOT%\Scripts\Tools\Windows\bin"
 
 if not exist "%TOOLS%\cmake.exe" (
-    echo [ERROR] Build tools not found.
-    echo         Run Scripts\setup_tools_windows.bat first.
+    echo [ERROR] cmake.exe not found in Scripts\Tools\Windows\bin\
+    echo         This file should be pre-committed in the repository.
+    echo         Try: git checkout -- Scripts/Tools/Windows/
     exit /b 1
 )
 if not exist "%TOOLS%\clang.exe" (
-    echo [ERROR] clang.exe not found.
-    echo         Run Scripts\setup_tools_windows.bat first.
+    echo [ERROR] clang.exe not found in Scripts\Tools\Windows\bin\
+    echo         This file should be pre-committed in the repository.
+    echo         Try: git checkout -- Scripts/Tools/Windows/
     exit /b 1
 )
 
