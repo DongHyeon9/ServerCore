@@ -16,6 +16,7 @@ if "%WSL_ROOT%"=="" (
     pause & exit /b 1
 )
 
+wsl bash -c "sed -i 's/\r$//' '%WSL_ROOT%/Scripts/Linux/_wsl_build.sh'"
 wsl bash "%WSL_ROOT%/Scripts/Linux/_wsl_build.sh" Debug "%WSL_ROOT%" libprotobuf glfw ImGui
 if %ERRORLEVEL% neq 0 ( echo [ERROR] Linux ThirdParty Debug build failed. & pause & exit /b %ERRORLEVEL% )
 

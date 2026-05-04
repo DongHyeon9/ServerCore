@@ -3,6 +3,9 @@
 ###############################################################################
 * text=auto
 
+# Shell scripts must always have LF line endings (CRLF breaks bash in WSL)
+*.sh text eol=lf
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
