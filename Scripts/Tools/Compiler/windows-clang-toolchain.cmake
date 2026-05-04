@@ -1,12 +1,14 @@
 # Windows x64 Clang 툴체인 (MSVC ABI)
 # 사전 조건:
-#   1. Scripts\setup_tools_windows.bat 실행 (최초 1회) — 컴파일러를 Scripts\Tools\Windows\bin\ 로 복사
-#   2. Visual Studio 2022 빌드 도구 설치 — Windows SDK 헤더/라이브러리 제공 (vcvars64.bat)
+#   1. Scripts\Tools\Windows\bin\ 에 컴파일러가 있어야 함 (리포지토리에 pre-committed)
+#   2. Scripts\Tools\Windows\sdk\ 에 SDK가 있어야 함 (리포지토리에 pre-committed)
+#      → VS2022 없이 빌드 가능
+#   ※ fallback: VS2022가 설치되어 있고 _setup_windows.bat이 vcvars64.bat을 호출한 경우에도 동작
 
 set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
-# 탐색 순서: 프로젝트 로컬 → LLVM_PATH 환경변수 → 독립 LLVM 설치
+# ── 컴파일러 탐색 ─────────────────────────────────────────────────────────────
 set(_LLVM_HINTS
     "${CMAKE_SOURCE_DIR}/Scripts/Tools/Windows/bin"
     "$ENV{LLVM_PATH}/bin"
@@ -45,3 +47,27 @@ set(CMAKE_CXX_COMPILER_TARGET x86_64-pc-windows-msvc)
 set(CMAKE_EXE_LINKER_FLAGS_INIT    "-fuse-ld=lld")
 set(CMAKE_SHARED_LINKER_FLAGS_INIT "-fuse-ld=lld")
 set(CMAKE_MODULE_LINKER_FLAGS_INIT "-fuse-ld=lld")
+
+# ── Pre-committed SDK 경로 설정 (VS2022 없이도 빌드 가능) ─────────────────────
+# CMAKE_CURRENT_LIST_DIR = Scripts/Tools/Compiler/
+# SDK 위치    = Scripts/Tools/Windows/sdk/
+get_filename_component(_SDK_ROOT "${CMAKE_CURRENT_LIST_DIR}/../Windows/sdk" ABSOLUTE)
+
+if(EXISTS "${_SDK_ROOT}/include/msvc")
+    # MSVC 버전 명시 (sdk_versions.txt 의 MSVC_VERSION 14.44.35207 → 19.44)
+    string(APPEND CMAKE_C_FLAGS_INIT   " -fms-compatibility-version=19.44")
+    string(APPEND CMAKE_CXX_FLAGS_INIT " -fms-compatibility-version=19.44")
+
+    # 시스템 헤더로 취급 (-imsvc = MSVC-compatible system include)
+    foreach(_inc msvc ucrt shared um)
+        string(APPEND CMAKE_C_FLAGS_INIT   " -imsvc${_SDK_ROOT}/include/${_inc}")
+        string(APPEND CMAKE_CXX_FLAGS_INIT " -imsvc${_SDK_ROOT}/include/${_inc}")
+    endforeach()
+
+    # 링커 라이브러리 검색 경로
+    foreach(_lib ucrt/x64 um/x64 msvc/x64)
+        string(APPEND CMAKE_EXE_LINKER_FLAGS_INIT    " /LIBPATH:${_SDK_ROOT}/lib/${_lib}")
+        string(APPEND CMAKE_SHARED_LINKER_FLAGS_INIT " /LIBPATH:${_SDK_ROOT}/lib/${_lib}")
+        string(APPEND CMAKE_MODULE_LINKER_FLAGS_INIT " /LIBPATH:${_SDK_ROOT}/lib/${_lib}")
+    endforeach()
+endif()

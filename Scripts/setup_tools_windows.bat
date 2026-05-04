@@ -70,7 +70,7 @@ xcopy /E /Y /I /Q "%VS_BASE%\VC\Tools\Llvm\x64\lib\clang\%CLANG_VER%" "%ROOT%\Sc
 
 echo.
 echo [SUCCESS] Tools copied to: %ROOT%\Scripts\Tools\Windows\
-echo           You can now run Scripts\Debug\debug_build.bat or
-echo                         Scripts\Release\release_build.bat
+echo           NOTE: Windows SDK headers/libs are pre-committed in Scripts\Tools\Windows\sdk\
+echo                 VS2022 is no longer required to build. Commit the sdk\ directory.
 pause
 endlocal
