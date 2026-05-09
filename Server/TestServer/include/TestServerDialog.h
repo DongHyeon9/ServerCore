@@ -1,12 +1,11 @@
 #pragma once
 #include "ServerDialog.h"
 
-class TestServerDialog : public server_dialog_base<TestServerDialog>
+class test_server_dialog : public server_dialog_base<test_server_dialog>
 {
 protected:
 	bool init_impl() override
 	{
-		// Custom initialization for TestServerDialog
 		return true;
 	}
 };

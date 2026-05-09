@@ -1,43 +1,45 @@
 # Windows x64 Clang 툴체인 (MSVC ABI)
-# 사전 조건:
-#   1. Scripts\Tools\Windows\bin\ 에 컴파일러가 있어야 함 (리포지토리에 pre-committed)
-#   2. Scripts\Tools\Windows\sdk\ 에 SDK가 있어야 함 (리포지토리에 pre-committed)
-#      → VS2022 없이 빌드 가능
-#   ※ fallback: VS2022가 설치되어 있고 _setup_windows.bat이 vcvars64.bat을 호출한 경우에도 동작
+# 사용 환경:
+#   - Docker 컨테이너 (권장): Linux clang이 x86_64-pc-windows-msvc 타겟으로 크로스컴파일
+#     → 컨테이너의 windows-clang-toolchain-docker.cmake가 이 파일을 include하여 사용
+#   - 호스트 직접 사용 시: $ENV{LLVM_PATH}/bin 또는 시스템 PATH의 clang 사용
+# SDK: Scripts\Tools\Windows\sdk\ (리포지토리에 pre-committed)
 
 set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
-# ── 컴파일러 탐색 ─────────────────────────────────────────────────────────────
-set(_LLVM_HINTS
-    "${CMAKE_SOURCE_DIR}/Scripts/Tools/Windows/bin"
-    "$ENV{LLVM_PATH}/bin"
-    "C:/Program Files/LLVM/bin"
-    "C:/Program Files (x86)/LLVM/bin"
-)
+# ── 컴파일러 탐색 (CMAKE_C_COMPILER가 외부에서 설정되지 않은 경우만) ──────────
+if(NOT CMAKE_C_COMPILER)
+    set(_LLVM_HINTS
+        "$ENV{LLVM_PATH}/bin"
+        "/usr/bin"
+        "C:/Program Files/LLVM/bin"
+        "C:/Program Files (x86)/LLVM/bin"
+    )
 
-find_program(CMAKE_C_COMPILER
-    NAMES clang
-    HINTS ${_LLVM_HINTS}
-    DOC "Clang C compiler"
-    REQUIRED
-)
-find_program(CMAKE_CXX_COMPILER
-    NAMES clang++
-    HINTS ${_LLVM_HINTS}
-    DOC "Clang C++ compiler"
-    REQUIRED
-)
-find_program(CMAKE_AR
-    NAMES llvm-ar
-    HINTS ${_LLVM_HINTS}
-    DOC "LLVM archiver"
-)
-find_program(CMAKE_RANLIB
-    NAMES llvm-ranlib
-    HINTS ${_LLVM_HINTS}
-    DOC "LLVM ranlib"
-)
+    find_program(CMAKE_C_COMPILER
+        NAMES clang
+        HINTS ${_LLVM_HINTS}
+        DOC "Clang C compiler"
+        REQUIRED
+    )
+    find_program(CMAKE_CXX_COMPILER
+        NAMES clang++
+        HINTS ${_LLVM_HINTS}
+        DOC "Clang C++ compiler"
+        REQUIRED
+    )
+    find_program(CMAKE_AR
+        NAMES llvm-ar
+        HINTS ${_LLVM_HINTS}
+        DOC "LLVM archiver"
+    )
+    find_program(CMAKE_RANLIB
+        NAMES llvm-ranlib
+        HINTS ${_LLVM_HINTS}
+        DOC "LLVM ranlib"
+    )
+endif()
 
 # Windows x64 MSVC ABI 타겟
 set(CMAKE_C_COMPILER_TARGET   x86_64-pc-windows-msvc)

@@ -1,5 +1,5 @@
 #pragma once
-#include "ServerEngine.h"
+#include "ServerDlgUtils.h"
 
 // ── 간단한 로그 버퍼 ──────────────────────────────────────────────────────────
 struct LogBuffer
@@ -50,7 +50,7 @@ struct LogBuffer
 
 void GlfwErrorCallback(int error, const char* description)
 {
-	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+	::fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
 template<class T>

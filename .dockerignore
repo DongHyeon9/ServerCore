@@ -1,0 +1,27 @@
+.git/
+.gitignore
+.gitattributes
+.vs/
+.vscode/
+.idea/
+.svn/
+.claude/
+ClaudeMD/
+
+bin/
+build/
+out/
+
+# Windows SDK는 마운트로 컨테이너에 노출되므로 이미지 컨텍스트에 포함시키지 않음
+Scripts/Tools/Windows/sdk/
+
+# 모든 Windows/macOS 바이너리는 이미지 컨텍스트에 불필요
+**/*.exe
+**/*.dll
+**/*.lib
+**/*.pdb
+**/*.dylib
+**/*.app
+
+README.md
+LICENSE

@@ -3,15 +3,24 @@
 ###############################################################################
 * text=auto
 
-# Shell scripts must always have LF line endings (CRLF breaks bash in WSL)
+# Shell scripts must always have LF line endings (CRLF breaks bash in containers/WSL)
 *.sh text eol=lf
+Scripts/Docker/entrypoint.sh text eol=lf
 
-# Pre-committed Windows tool binaries — never apply text/EOL processing
+# Dockerfile keeps LF (host-agnostic build context)
+Dockerfile text eol=lf
+
+# Windows .bat scripts use CRLF
+*.bat text eol=crlf
+
+# Build artifacts — never apply text/EOL processing
 *.exe binary
 *.dll binary
 *.lib binary
 *.a   binary
 *.pdb binary
+*.so  binary
+*.dylib binary
 
 ###############################################################################
 # Set default behavior for command prompt diff.
