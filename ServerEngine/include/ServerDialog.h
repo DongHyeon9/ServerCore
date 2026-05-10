@@ -1,5 +1,5 @@
 #pragma once
-#include "ServerDlgUtils.h"
+#include "ServerDialogPreset.h"
 
 // ── 간단한 로그 버퍼 ──────────────────────────────────────────────────────────
 struct LogBuffer
@@ -48,7 +48,7 @@ struct LogBuffer
 	}
 };
 
-void GlfwErrorCallback(int error, const char* description)
+inline void GlfwErrorCallback(int error, const char* description)
 {
 	::fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
@@ -59,65 +59,52 @@ class server_dialog_base : public singleton<T>
 public:
 	bool init() override
 	{
+		pre_init_impl();
+
 		::glfwSetErrorCallback(GlfwErrorCallback);
 		if (!::glfwInit())
 			return false;
 
-		const char* glsl_version = "#version 130";
-		::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+		::glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, _info.glfw_version.major);
+		::glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, _info.glfw_version.minor);
 
-		window = ::glfwCreateWindow(1280, 720, "TestServer Monitor 2", nullptr, nullptr);
-		if (!window) { ::glfwTerminate(); return false; }
+		_window = ::glfwCreateWindow(
+			_info.window_size.width,
+			_info.window_size.height,
+			_info.title.c_str(), nullptr, nullptr);
+		if (!_window) 
+		{ 
+			::glfwTerminate();
+			return false; 
+		}
 
-		::glfwMakeContextCurrent(window);
-		::glfwSwapInterval(1);
+		::glfwMakeContextCurrent(_window);
+		::glfwSwapInterval(_info.swap_interval);
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= _info.imgui_config_flags;
 
 		ImGui::StyleColorsDark();
 
-		::ImGui_ImplGlfw_InitForOpenGL(window, true);
-		::ImGui_ImplOpenGL3_Init(glsl_version);
-
+		::ImGui_ImplGlfw_InitForOpenGL(_window, true);
+		::ImGui_ImplOpenGL3_Init(_info.glsl_version.c_str());
 
 		return init_impl();
 	}
 
 	int run()
 	{
-		::glfwSetWindowTitle(window, "TestServer Monitor 3");
-
 		log.add("TestServer started");
 
 		// ── 메인 루프 ─────────────────────────────────────────────────────────────
-		while (!glfwWindowShouldClose(window))
+		while (!glfwWindowShouldClose(_window))
 		{
-			::glfwPollEvents();
-			if (::glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
-			{
-				::ImGui_ImplGlfw_Sleep(10);
-				continue;
-			}
-
-			::ImGui_ImplOpenGL3_NewFrame();
-			::ImGui_ImplGlfw_NewFrame();
-			ImGui::NewFrame();
+			render_begin();
 			ImGuiIO& io = ImGui::GetIO();
 
-			// ── 메뉴 바 ───────────────────────────────────────────────────────────
-			if (ImGui::BeginMainMenuBar())
-			{
-				if (ImGui::BeginMenu("Server"))
-				{
-					if (ImGui::MenuItem("Exit"))
-						::glfwSetWindowShouldClose(window, true);
-					ImGui::EndMenu();
-				}
-				ImGui::EndMainMenuBar();
-			}
+			for (auto item : _items)
+				item.second->draw();
 
 			// ── 서버 컨트롤 패널 ──────────────────────────────────────────────────
 			ImGui::SetNextWindowPos(ImVec2(10, 30), ImGuiCond_FirstUseEver);
@@ -182,16 +169,7 @@ public:
 			ImGui::SetNextWindowPos(ImVec2(10, 220), ImGuiCond_FirstUseEver);
 			log.draw("Log");
 
-			// ── 렌더링 ────────────────────────────────────────────────────────────
-			ImGui::Render();
-			int display_w, display_h;
-			::glfwGetFramebufferSize(window, &display_w, &display_h);
-			::glViewport(0, 0, display_w, display_h);
-			::glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-			::glClear(GL_COLOR_BUFFER_BIT);
-			::ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-			::glfwSwapBuffers(window);
+			render_end();
 		}
 		return 0;
 	}
@@ -201,15 +179,78 @@ public:
 		::ImGui_ImplOpenGL3_Shutdown();
 		::ImGui_ImplGlfw_Shutdown();
 		::ImGui::DestroyContext();
-		::glfwDestroyWindow(window);
+		::glfwDestroyWindow(_window);
 		::glfwTerminate();
 	}
 
+	void close_dialog()
+	{
+		::glfwSetWindowShouldClose(_window, true);
+	}
+
 protected:
+	// 기본 초기화 이후 서버 대화상자 고유의 초기화 작업을 수행하기 위한 함수
 	virtual bool init_impl() = 0;
+	//dialog_info 설정 등 GLFW 초기화 전에 필요한 작업을 수행하기 위한 함수
+	virtual void pre_init_impl() = 0;
 
 private:
-	GLFWwindow* window{};
+	void render_begin()
+	{
+		::glfwPollEvents();
+		if (::glfwGetWindowAttrib(_window, GLFW_ICONIFIED) != 0)
+		{
+			::ImGui_ImplGlfw_Sleep(10);
+			return;
+		}
+
+		::ImGui_ImplOpenGL3_NewFrame();
+		::ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	void render_end()
+	{
+		ImGui::Render();
+		int display_w, display_h;
+		::glfwGetFramebufferSize(_window, &display_w, &display_h);
+		::glViewport(0, 0, display_w, display_h);
+		::glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		::glClear(GL_COLOR_BUFFER_BIT);
+		::ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		::glfwSwapBuffers(_window);
+	}
+
+public:
+	struct dialog_info
+	{
+		struct window_size
+		{
+			int32 width{ 1280 };
+			int32 height{ 720 };
+		} window_size;
+
+		struct glfw_version
+		{
+			int major{ 3 };
+			int minor{ 0 };
+		} glfw_version;
+
+		int32 swap_interval{ 1 };
+
+		ImGuiConfigFlags imgui_config_flags{ ImGuiConfigFlags_NavEnableKeyboard };
+
+		std::string glsl_version{ "#version 130" };
+		std::string title{ "server dialog" };
+	};
+
+protected:
+	dialog_info _info{};
+	std::unordered_map<std::string, std::shared_ptr<dialog::component_base>> _items{};
+
+private:
+	GLFWwindow* _window{};
 
 	// ── 상태 변수 ─────────────────────────────────────────────────────────────
 	LogBuffer log;

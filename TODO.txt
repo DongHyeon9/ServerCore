@@ -1,0 +1,19 @@
+디버깅,모니터링 GUI
+
+static_cast로 rtti 구현 고려(탐색한 pannel_item을 cast해서 기능 사용)
+dialog::interface::hierarchy 구조 고려(탐색 기능이 필요함)
+서버 다이얼로그 프리셋 구현(log)
+
+assert 구현
+
+Asio
+구글 protobuf
+Producer Consumer
+메모리 풀
+AWS (EC2, Lambda )
+DB ( Redis, RDS, Dynamo )
+Unreal 연동(플러그인)
+DevOps ( CMake, Jenkins, Docker, k8s, 스팀 )
+
+파이썬으로 빌드할때 뷰 제공
+Linux빌드 시 Docker에서 실행될 수 있도록 변경

@@ -7,6 +7,7 @@
 #include <memory>
 #include <functional>
 #include <algorithm>
+#include <concepts>
 
 #include <array>
 #include <vector>

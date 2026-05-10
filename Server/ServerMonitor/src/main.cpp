@@ -4,14 +4,14 @@
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
-static void GlfwErrorCallback(int error, const char* description)
-{
-    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
-}
+//static void GlfwErrorCallback(int error, const char* description)
+//{
+//    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+//}
 
 int main()
 {
-    glfwSetErrorCallback(GlfwErrorCallback);
+    //glfwSetErrorCallback(GlfwErrorCallback);
     if (!glfwInit())
         return 1;
 
