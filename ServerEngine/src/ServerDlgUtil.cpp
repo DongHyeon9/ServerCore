@@ -11,7 +11,6 @@ namespace dialog
 		}
 	}
 
-
 	void menu_item::draw()
 	{
 		if (ImGui::MenuItem(_label.c_str()))
@@ -38,9 +37,9 @@ namespace dialog
 		}
 	}
 
-	namespace pannel_item
+	namespace panel_item
 	{
-		void mutiple_item::draw()
+		void multiple_item::draw()
 		{
 			for (auto item : _items)
 			{
@@ -67,11 +66,13 @@ namespace dialog
 
 		void rich_text::draw()
 		{
-			ImGui::TextColored(_color, _text.c_str());
+			ImGui::PushStyleColor(ImGuiCol_Text, _color);
+			ImGui::TextUnformatted(_text.c_str());
+			ImGui::PopStyleColor();
 		}
 	}
 
-	void pannel::draw()
+	void panel::draw()
 	{
 		ImGui::SetNextWindowPos(_desc._pos._point, _desc._pos._cond);
 		ImGui::SetNextWindowSize(_desc._size._point, _desc._size._cond);

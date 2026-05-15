@@ -2,7 +2,7 @@ project(ServerEngine)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_library(ServerEngine STATIC ${SOURCES} "include/ServerDialog.h"  "include/Struct.h" "include/ServerDlgUtil.h" "src/ServerDlgUtil.cpp" "include/ServerDialogPreset.h" "src/ServerDialogPreset.cpp" "include/Util.h" "src/Util.cpp")
+add_library(ServerEngine STATIC ${SOURCES} "include/ServerDialog.h"  "include/Core/Struct.h" "include/Core/Header.h" "include/Core/Type.h" "include/ServerDlgUtil.h" "src/ServerDlgUtil.cpp" "include/ServerDialogPreset.h" "src/ServerDialogPreset.cpp" "include/Core/Util.h" "src/Util.cpp" "include/Core/Preprocess.h")
 
 target_include_directories(ServerEngine PUBLIC include)
 

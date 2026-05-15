@@ -1,4 +1,4 @@
-#include "Util.h"
+#include "Core/Util.h"
 #include <cstdarg>
 #include <cstdio>
 
@@ -24,15 +24,6 @@ namespace string_util
 		va_list args;
 		va_start(args, Fmt);
 		std::string result = vformat(Fmt, args);
-		va_end(args);
-		return result;
-	}
-
-	std::string format(std::string Str, ...)
-	{
-		va_list args;
-		va_start(args, Str);
-		std::string result = vformat(Str.c_str(), args);
 		va_end(args);
 		return result;
 	}
